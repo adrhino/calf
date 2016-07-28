@@ -22,29 +22,28 @@ const api = joiql({
   }
 })
 
-api.on('query', async ({ req, res }) => {
+api.on('query mutation', async ({ req, res }) => {
   forEach(req, ({ fields, args }, resource) => {
     if (args._id) args._id = ObjectId(args._id)
   })
 })
 api.on('query.campaign', async ({ req, res }) => {
   res.campaign = await db.campaigns.findOne(req.args)
-  console.log('got campaign', res.campaign)
 })
-// api.on('query.campaigns', async ({ req, res }) => {
-//   res.campaigns = await db.campaigns.find(req.args)
-// })
-// api.on('mutation.saveCampaign', async ({ req, res }) => {
-//   res.saveCampaign = await db.campaigns.save(req.args)
-// })
-// api.on('mutation.deleteCampaign', async ({ req, res }) => {
-//   await db.campaigns.deleteOne(req.args)
-// })
-// api.on('query.regions', async ({ res }) => {
-//   res.campaign = await db.campaigns.distinct('regions')
-// })
-// api.on('query.channels', async ({ res }) => {
-//   res.campaign = await db.campaigns.distinct('channels')
-// })
+api.on('query.campaigns', async ({ req, res }) => {
+  res.campaigns = await db.campaigns.find(req.args)
+})
+api.on('mutation.saveCampaign', async ({ req, res }) => {
+  res.saveCampaign = await db.campaigns.save(req.args)
+})
+api.on('mutation.deleteCampaign', async ({ req, res }) => {
+  await db.campaigns.remove(req.args, { justOne: true })
+})
+api.on('query.regions', async ({ res }) => {
+  res.regions = await db.campaigns.distinct('regions')
+})
+api.on('query.channels', async ({ res }) => {
+  res.channels = await db.campaigns.distinct('channels')
+})
 
 export default api.schema
